@@ -81,6 +81,38 @@ var ImgFigure = React.createClass({
   }
 
 });
+
+//控制组件
+var ControllerUnit = React.createClass({
+  handleClick: function (e) {
+
+    if(this.props.arrange.isCenter){
+      this.props.inverse();
+    }else {
+      this.props.center();
+    }
+    e.stopPropagation();
+    e.preventDefault();
+  },
+  render: function () {
+    var controllerUnitClassName = 'controller-unit';
+
+    //如果图片是居中状态，则加上居中样式
+    if(this.props.arrange.isCenter){
+      controllerUnitClassName += ' is-center';
+
+      //如果图片是翻转状态，则加上翻转样式
+      if(this.props.arrange.isInverse){
+        controllerUnitClassName += ' is-inverse';
+      }
+    }
+    return (
+      <span className={controllerUnitClassName} onClick={this.handleClick}></span>
+    );
+  }
+});
+
+//舞台组件
 var AppComponent = React.createClass({
   Constant: {
     centerPos: {
@@ -140,7 +172,7 @@ var AppComponent = React.createClass({
       vPosRangeX = vPosRange.x,
 
       imgsArrangeTopArr = [],
-      topImgNum = Math.ceil(Math.random() * 2), //上部区域取一个或者不取
+      topImgNum = Math.floor(Math.random() * 2), //上部区域取一个或者不取
       topImgSpliceIndex = 0, //标记上部图片在图片数组中的位置
 
       imgArrangeCenterArr = imgsArrangeArr.splice(centerPosIndex,1); //居中图片的状态信息
@@ -149,7 +181,8 @@ var AppComponent = React.createClass({
     imgArrangeCenterArr[0] = {
       pos: centerPos,
       rotate: 0,
-      isCenter: true
+      isCenter: true,
+      isInverse: false
     }
 
     //取出要布局上侧图片的状态信息
@@ -164,7 +197,8 @@ var AppComponent = React.createClass({
           top: getRangeRadom(vPosRangeTopY[0], vPosRangeTopY[1])
         },
         rotate: get30DegRandom(),
-        isCenter: false
+        isCenter: false,
+        isInverse: false
       }
     });
 
@@ -185,7 +219,8 @@ var AppComponent = React.createClass({
           top: getRangeRadom(hPosRangeY[0], hPosRangeY[1])
         },
         rotate: get30DegRandom(),
-        isCenter: false
+        isCenter: false,
+        isInverse: false
       }
     }
 
@@ -263,11 +298,13 @@ var AppComponent = React.createClass({
             top: 0
           },
           rotate: 0,
-          isInverse: false
+          isInverse: false,
+          idCenter: false
         }
       }
       imgFigures.push(<ImgFigure data={value} key={'imgFigure' + index} ref={'imgFigure' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)}
-      center={this.center(index)}/>)
+      center={this.center(index)}/>);
+      controllorUnits.push(<ControllerUnit key={'ctlUnit' + index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>)
     }.bind(this));
 
     return (
